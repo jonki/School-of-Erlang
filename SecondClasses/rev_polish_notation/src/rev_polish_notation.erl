@@ -3,10 +3,8 @@
 -export([evaluate/1, eval/1]).
 
 
-call(El, [F, S | T]) ->
-    [El(F, S)] ++ T.
-
-calc(El, Acc) when is_function(El) -> call(El, Acc);
+calc(El, [F | T]) when is_function(El, 1) -> [El(F)] ++ T;
+calc(El, [F, S | T]) when is_function(El, 2) -> [El(F, S)] ++ T;
 calc(El, Acc) -> [El] ++ Acc.
 
 evaluate(List) ->
@@ -16,7 +14,10 @@ evaluate(List) ->
 eval(Input) ->
     eval(Input, []).
 
-eval([Input | Tl], [F, S | T]) when is_function(Input) ->
+eval([Input | Tl], [F | T]) when is_function(Input, 1) ->
+    eval(Tl, [Input(F)] ++ T);
+
+eval([Input | Tl], [F, S | T]) when is_function(Input, 2) ->
     eval(Tl, [Input(F, S)] ++ T);
 
 eval([Input | Tl], Stack) ->
