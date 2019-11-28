@@ -37,7 +37,7 @@ JavaScript
 
 ```javascript
 function gcd_two_numbers(x, y) {
-  while(y) {
+  while(y !== 0) {
     var t = y;
     y = x % y;
     x = t;
