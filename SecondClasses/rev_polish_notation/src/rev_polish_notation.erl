@@ -1,28 +1,27 @@
 -module(rev_polish_notation).
 
--export([evaluate/1]).
+-export([evaluate/1, eval/1]).
 
 
-%% evaluate(_) ->
-%%     1.
+call(El, [F, S | T]) ->
+    [El(F, S)] ++ T.
 
-
-push(List, Elem) ->
-    [Elem | List].
-
-pop([Elem | Tail]) ->
-    {Elem, Tail}.
-
-call([F, S | _], Fn) ->
-     Fn(F, S).
-
-calc(El, Acc) ->
-    case is_function(El) of
-        true -> call(Acc, El);
-        false -> Acc ++ [El]
-    end.
+calc(El, Acc) when is_function(El) -> call(El, Acc);
+calc(El, Acc) -> [El] ++ Acc.
 
 evaluate(List) ->
-    lists:foldl(fun calc/2, [], List).
+    [H] = lists:foldl(fun calc/2, [], List),
+    H.
 
-%% evaluate([3,4, fun erlang:'+'/2]).
+eval(Input) ->
+    eval(Input, []).
+
+eval([Input | Tl], Stack) when is_function(Input) ->
+    [F, S | T] = Stack,
+    eval(Tl, [Input(F, S)] ++ T);
+
+eval([Input | Tl], Stack) ->
+    eval(Tl, [Input] ++ Stack);
+
+eval([], [Stack]) ->
+    Stack.
