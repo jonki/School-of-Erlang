@@ -1,6 +1,6 @@
 -module(multiples).
 
--export([thousand_sum/0]).
+-export([thousand_sum/0, thousand_sum2/0]).
 
 thousand() ->
     lists:seq(1, 1000).
@@ -19,3 +19,10 @@ calc(El, Acc) ->
 
 thousand_sum() ->
     lists:foldl(fun calc/2, 0, thousand()).
+
+
+only35(El) ->
+    El rem 3 == 0 orelse El rem 5 == 0.
+
+thousand_sum2() ->
+    lists:sum(lists:filter(fun only35/1, thousand())).
