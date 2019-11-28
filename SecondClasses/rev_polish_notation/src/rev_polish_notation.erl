@@ -16,8 +16,7 @@ evaluate(List) ->
 eval(Input) ->
     eval(Input, []).
 
-eval([Input | Tl], Stack) when is_function(Input) ->
-    [F, S | T] = Stack,
+eval([Input | Tl], [F, S | T]) when is_function(Input) ->
     eval(Tl, [Input(F, S)] ++ T);
 
 eval([Input | Tl], Stack) ->
