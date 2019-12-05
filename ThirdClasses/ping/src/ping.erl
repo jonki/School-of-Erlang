@@ -9,22 +9,35 @@
 -type byte_integer() :: 0..255.
 -type maybe_range() :: {byte_integer(), byte_integer()} | byte_integer().
 
+make_list({A, B}) ->
+    lists:seq(A, B);
+make_list(A) ->
+    [A].
 
--spec ping_all(FirstR, SecondR, ThirdR, FourthR, Count) -> ok when 
+stringify([A,B,C,D]) ->
+    integer_to_list(A) ++ integer_to_list(B) ++ integer_to_list(C) ++ integer_to_list(D).
+
+-spec ping_all(FirstR, SecondR, ThirdR, FourthR, Count) -> ok when
     FirstR :: maybe_range(),
     SecondR :: maybe_range(),
     ThirdR :: maybe_range(),
     FourthR :: maybe_range(),
     Count :: pos_integer().
 ping_all(MaybeRange1, MaybeRange2, MaybeRange3, MaybeRange4, Count) ->
-    % 1) replace mabye_ranges = {From, To} with list [Form, To] and  
-    % and replace mabye_ranges = SingleInt with lists [SingleList] 
-    % 2) generate a list of IP addresses, a list comprehension might be helpful
-    % 3) foreach IP address spawn a process which will execute ping command and then
+    AllThings = lists:map(
+                  fun make_list/1,
+                  [MaybeRange1, MaybeRange2, MaybeRange3, MaybeRange4]),
+    Things = [ [A,B,C,D] || A <- lists:nth(1, AllThings),
+                            B <- lists:nth(2, AllThings),
+                            C <- lists:nth(3, AllThings),
+                            D <- lists:nth(4, AllThings)],
+    IPS = lists:map(fun stringify/1, Things),
+    % 3) for each IP address spawn a process which will execute ping command and then
     % it will send a result to the parent process
-    % 4) Parent process should receive messages in a loop 
+    % 4) Parent process should receive messages in a loop
     %  when all processes finish their tasks and report the results print the result.
-    ok.
+    IPS.
+    %% ok.
 
 make_range(_) -> ok.
 
@@ -50,10 +63,10 @@ integer_is_replaced_with_single_element_list_test() ->
 
 integer_is_replaced_with_single_element_list_with_random_int_test() ->
     [
-        begin 
-            RandomInt = rand:uniform(2000 * 1000) - 1000 * 1000,
-            ?assertEqual([RandomInt], make_range(RandomInt))
-        end || _ <- lists:seq(1, 1000 * 10) ].
+     begin
+         RandomInt = rand:uniform(2000 * 1000) - 1000 * 1000,
+         ?assertEqual([RandomInt], make_range(RandomInt))
+     end || _ <- lists:seq(1, 1000 * 10) ].
 
 range_is_replaced_with_a_list_starting_with_from_and_ending_with_to_test() ->
     Range = make_range({5, 255}),
