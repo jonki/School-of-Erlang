@@ -27,15 +27,15 @@ ping_all(MaybeRange1, MaybeRange2, MaybeRange3, MaybeRange4, Count) ->
     AllThings = lists:map(
                   fun make_list/1,
                   [MaybeRange1, MaybeRange2, MaybeRange3, MaybeRange4]),
-    Things = [ [A,B,C,D] || A <- lists:nth(1, AllThings),
-                            B <- lists:nth(2, AllThings),
-                            C <- lists:nth(3, AllThings),
-                            D <- lists:nth(4, AllThings)],
+    Things = [[A,B,C,D] || A <- lists:nth(1, AllThings),
+                           B <- lists:nth(2, AllThings),
+                           C <- lists:nth(3, AllThings),
+                           D <- lists:nth(4, AllThings)],
     IPS = lists:map(fun stringify/1, Things),
     % 3) for each IP address spawn a process which will execute ping command and then
     % it will send a result to the parent process
     % 4) Parent process should receive messages in a loop
-    %  when all processes finish their tasks and report the results print the result.
+    % when all processes finish their tasks and report the results print the result.
     IPS.
     %% ok.
 
